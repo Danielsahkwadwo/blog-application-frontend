@@ -14,12 +14,7 @@ A modern, cloud-based personal photo blog application built with React, TypeScri
 * [Project Structure](#project-structure)
 * [Dependencies](#dependencies)
 * [Contributing](#contributing)
-* [License](#license)
 * [API Documentation](#api-documentation)
-* [Database Schema](#database-schema)
-* [Security](#security)
-* [Troubleshooting](#troubleshooting)
-* [Changelog](#changelog)
 
 ## Overview
 ------------
