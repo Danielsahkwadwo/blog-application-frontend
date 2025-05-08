@@ -8,12 +8,14 @@ import { useToast } from '../hooks/useToast';
 import { Camera } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<{
-    name?: string;
+    firstName?: string;
+    lastName?: string;
     email?: string;
     password?: string;
     confirmPassword?: string;
@@ -25,14 +27,19 @@ export const SignupPage: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: {
-      name?: string;
+      firstName?: string;
+      lastName?: string;
       email?: string;
       password?: string;
       confirmPassword?: string;
     } = {};
     
-    if (!name) {
-      newErrors.name = 'Name is required';
+    if (!firstName) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    if (!lastName) {
+      newErrors.lastName = 'Last name is required';
     }
     
     if (!email) {
@@ -60,7 +67,8 @@ export const SignupPage: React.FC = () => {
     
     if (!validateForm()) return;
     
-    const success = await signup(name, email, password);
+    const fullName = `${firstName} ${lastName}`.trim();
+    const success = await signup(fullName, email, password);
     
     if (success) {
       showToast('Account created successfully', 'success');
@@ -71,19 +79,19 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Camera className="h-12 w-12 text-primary-600" />
         </div>
-        <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
           Create a new account
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Or{' '}
           <Link
             to="/login"
-            className="font-medium text-primary-600 hover:text-primary-700"
+            className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             sign in to your existing account
           </Link>
@@ -94,16 +102,29 @@ export const SignupPage: React.FC = () => {
         <Card>
           <CardContent className="py-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <Input
-                id="name"
-                type="text"
-                label="Full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={errors.name}
-                fullWidth
-                autoComplete="name"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  id="firstName"
+                  type="text"
+                  label="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  error={errors.firstName}
+                  fullWidth
+                  autoComplete="given-name"
+                />
+
+                <Input
+                  id="lastName"
+                  type="text"
+                  label="Last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  error={errors.lastName}
+                  fullWidth
+                  autoComplete="family-name"
+                />
+              </div>
 
               <Input
                 id="email"
