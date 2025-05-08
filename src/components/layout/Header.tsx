@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
   ];
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+    <header className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -117,7 +117,7 @@ export const Header: React.FC = () => {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 animate-fadeIn">
+        <div className="md:hidden bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 animate-fadeIn shadow-lg">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {isAuthenticated && (
               <>

@@ -5,7 +5,8 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
-import { Camera } from 'lucide-react';
+import { Camera, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export const LoginPage: React.FC = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const { login, loading } = useAuth();
   const { showToast } = useToast();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -48,19 +50,28 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          aria-label="Toggle dark mode"
+        >
+          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
+      </div>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Camera className="h-12 w-12 text-primary-600" />
         </div>
-        <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-3 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
           Sign in to your account
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Or{' '}
           <Link
             to="/signup"
-            className="font-medium text-primary-600 hover:text-primary-700"
+            className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             create a new account
           </Link>
@@ -103,19 +114,19 @@ export const LoginPage: React.FC = () => {
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm text-gray-700"
+                    className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
                   >
                     Remember me
                   </label>
                 </div>
 
                 <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-medium text-primary-600 hover:text-primary-500"
+                  <Link
+                    to="/forgot-password"
+                    className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -128,9 +139,9 @@ export const LoginPage: React.FC = () => {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="bg-gray-50 border-t border-gray-200">
+          <CardFooter className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             <div className="text-center w-full">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Demo credentials: <span className="font-medium">demo@example.com</span> / <span className="font-medium">password123</span>
               </p>
             </div>

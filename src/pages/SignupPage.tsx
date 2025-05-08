@@ -5,7 +5,8 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../hooks/useToast';
-import { Camera } from 'lucide-react';
+import { Camera, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export const SignupPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -23,6 +24,7 @@ export const SignupPage: React.FC = () => {
   
   const { signup, loading } = useAuth();
   const { showToast } = useToast();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -80,6 +82,15 @@ export const SignupPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          aria-label="Toggle dark mode"
+        >
+          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
+      </div>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Camera className="h-12 w-12 text-primary-600" />
