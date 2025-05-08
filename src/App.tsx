@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PhotoProvider } from './context/PhotoContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Pages
 import { LoginPage } from './pages/LoginPage';
@@ -46,13 +47,15 @@ function AppRoutes() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <NotificationProvider>
-          <PhotoProvider>
-            <AppRoutes />
-          </PhotoProvider>
-        </NotificationProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <PhotoProvider>
+              <AppRoutes />
+            </PhotoProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }

@@ -16,19 +16,19 @@ export const DashboardPage: React.FC = () => {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Photos</h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Photos</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {photos.length} photos in your collection
             </p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-md">
+            <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-md">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded ${
                   viewMode === 'grid'
-                    ? 'bg-white shadow text-primary-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white dark:bg-gray-700 shadow text-primary-600 dark:text-primary-400'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 <Grid className="h-4 w-4" />
@@ -37,8 +37,8 @@ export const DashboardPage: React.FC = () => {
                 onClick={() => setViewMode('list')}
                 className={`p-1.5 rounded ${
                   viewMode === 'list'
-                    ? 'bg-white shadow text-primary-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white dark:bg-gray-700 shadow text-primary-600 dark:text-primary-400'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 <List className="h-4 w-4" />
@@ -61,7 +61,7 @@ export const DashboardPage: React.FC = () => {
           <RefreshCw className="h-8 w-8 text-primary-500 animate-spin" />
         </div>
       ) : (
-        <PhotoGrid photos={photos} loading={loading} />
+        <PhotoGrid photos={photos} loading={loading} viewMode={viewMode} />
       )}
     </Layout>
   );
