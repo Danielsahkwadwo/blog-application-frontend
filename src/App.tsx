@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { PhotoProvider } from './context/PhotoContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ThemeProvider } from './context/ThemeContext';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 
 // Pages
 import { LoginPage } from './pages/LoginPage';
@@ -13,6 +14,9 @@ import { UploadPage } from './pages/UploadPage';
 import { RecycleBinPage } from './pages/RecycleBinPage';
 import { SharedPhotoPage } from './pages/SharedPhotoPage';
 import { LandingPage } from './pages/LandingPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { ErrorPage } from './pages/ErrorPage';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
@@ -35,11 +39,15 @@ function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
       <Route path="/upload" element={<ProtectedRoute element={<UploadPage />} />} />
       <Route path="/recycle-bin" element={<ProtectedRoute element={<RecycleBinPage />} />} />
       <Route path="/shared/:id" element={<SharedPhotoPage />} />
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/404" element={<ErrorPage />} />
+      <Route path="/error" element={<ErrorPage statusCode={500} title="Server Error" message="Something went wrong on our end. Please try again later or contact support if the problem persists." />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 }
@@ -51,7 +59,9 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <PhotoProvider>
-              <AppRoutes />
+              <ErrorBoundary>
+                <AppRoutes />
+              </ErrorBoundary>
             </PhotoProvider>
           </NotificationProvider>
         </AuthProvider>

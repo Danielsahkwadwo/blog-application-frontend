@@ -8,6 +8,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  requestPasswordReset: (email: string) => Promise<boolean>;
+  resetPassword: (token: string, newPassword: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -103,6 +105,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('user');
   };
 
+  const requestPasswordReset = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    
+    // Simulate API request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Check if email exists
+    const userExists = MOCK_USERS.some(u => u.email === email);
+    
+    setLoading(false);
+    
+    // In a real app, we would send a reset email if the user exists
+    // For demo purposes, we'll just return whether the email exists
+    return userExists;
+  };
+
+  const resetPassword = async (token: string, newPassword: string): Promise<boolean> => {
+    setLoading(true);
+    
+    // Simulate API request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // In a real app, we would validate the token and update the password in the database
+    // For demo purposes, we'll just simulate success (unless token contains 'invalid')
+    const isValidToken = !token.includes('invalid');
+    
+    setLoading(false);
+    return isValidToken;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -112,6 +144,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
+        requestPasswordReset,
+        resetPassword,
       }}
     >
       {children}
