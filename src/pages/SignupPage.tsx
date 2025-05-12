@@ -70,12 +70,11 @@ export const SignupPage: React.FC = () => {
 
         if (!validateForm()) return;
 
-        const fullName = `${firstName} ${lastName}`.trim();
-        const success = await signup(fullName, email, password);
+        const success = await signup(firstName, lastName, email, password);
 
         if (success) {
-            showToast("Account created successfully", "success");
-            navigate("/dashboard");
+            showToast("Check your inbox for confirmation code", "success");
+            navigate("/confirm-account");
         } else {
             showToast("Email already in use", "error");
         }
