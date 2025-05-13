@@ -45,7 +45,7 @@ export const LoginPage: React.FC = () => {
             showToast("Successfully logged in", "success");
             navigate("/dashboard");
         } else {
-            showToast("Invalid email or password", "error");
+            showToast("Bad credentials", "error");
         }
     };
 

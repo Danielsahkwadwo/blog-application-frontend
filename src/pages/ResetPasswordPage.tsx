@@ -1,52 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../hooks/useToast";
-import { Camera, Sun, Moon, ArrowLeft, Check, AlertTriangle } from "lucide-react";
+import { Camera, Sun, Moon, ArrowLeft, Check } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { isPasswordValid } from "../helpers";
+
+interface ResetPasswordForm {
+    email: string;
+    resetToken: string;
+    password: string;
+    confirmPassword: string;
+}
 
 export const ResetPasswordPage: React.FC = () => {
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [form, setForm] = useState<ResetPasswordForm>({
+        email: "",
+        resetToken: "",
+        password: "",
+        confirmPassword: "",
+    });
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [isValidToken, setIsValidToken] = useState(true);
-    const [isLoading, setIsLoading] = useState(true);
-    const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState<Partial<ResetPasswordForm>>({});
     const { showToast } = useToast();
     const { isDark, toggleTheme } = useTheme();
     const { resetPassword } = useAuth();
     const navigate = useNavigate();
-    const { token } = useParams<{ token: string }>();
-
-    useEffect(() => {
-        const validateToken = async () => {
-            // Simulate API request delay
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            if (token && token.includes("invalid")) {
-                setIsValidToken(false);
-            }
-
-            setIsLoading(false);
-        };
-
-        validateToken();
-    }, [token]);
 
     const validateForm = () => {
-        const newErrors: { password?: string; confirmPassword?: string } = {};
+        const newErrors: Partial<ResetPasswordForm> = {};
 
-        if (!password) {
-            newErrors.password = "Password is required";
-        } else if (password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
+        if (!form.email) {
+            newErrors.email = "Email is required";
         }
 
-        if (password !== confirmPassword) {
+        if (!form.resetToken) {
+            newErrors.resetToken = "Reset token is required";
+        }
+
+        if (!form.password) {
+            newErrors.password = "Password is required";
+        } else if (!isPasswordValid(form.password)) {
+            newErrors.password = "Password needs 8+ chars, upper/lowercase, number, special char.";
+        }
+
+        if (form.password !== form.confirmPassword) {
             newErrors.confirmPassword = "Passwords do not match";
         }
 
@@ -62,17 +64,14 @@ export const ResetPasswordPage: React.FC = () => {
         setIsLoading(true);
 
         // Call the resetPassword method from AuthContext
-        if (token) {
-            const success = await resetPassword(token, password);
 
-            if (success) {
-                setIsSubmitted(true);
-                showToast("Password has been reset successfully", "success");
-            } else {
-                showToast("Failed to reset password. Please try again.", "error");
-            }
+        const success = await resetPassword(form.email, form.resetToken, form.password);
+
+        if (success) {
+            setIsSubmitted(true);
+            showToast("Password has been reset successfully", "success");
         } else {
-            showToast("Invalid reset token", "error");
+            showToast("Failed to reset password. Please try again.", "error");
         }
 
         setIsLoading(false);
@@ -82,54 +81,6 @@ export const ResetPasswordPage: React.FC = () => {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-            </div>
-        );
-    }
-
-    if (!isValidToken) {
-        return (
-            <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
-                <div className="absolute top-4 right-4">
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
-                        aria-label="Toggle dark mode"
-                    >
-                        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                    </button>
-                </div>
-
-                <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                    <Card>
-                        <CardContent className="py-8 text-center">
-                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900">
-                                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-300" />
-                            </div>
-                            <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-                                Invalid or Expired Link
-                            </h3>
-                            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                The password reset link is invalid or has expired.
-                            </p>
-                            <div className="mt-6">
-                                <Link to="/forgot-password">
-                                    <Button>Request a new link</Button>
-                                </Link>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                            <div className="w-full flex justify-center">
-                                <Link
-                                    to="/login"
-                                    className="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                >
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Back to login
-                                </Link>
-                            </div>
-                        </CardFooter>
-                    </Card>
-                </div>
             </div>
         );
     }
@@ -165,10 +116,32 @@ export const ResetPasswordPage: React.FC = () => {
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <Input
                                     autoFocus={true}
+                                    id="email"
+                                    type="email"
+                                    value={form.email}
+                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                    error={errors.email}
+                                    fullWidth
+                                    autoComplete="email"
+                                    placeholder="Email address"
+                                />
+
+                                <Input
+                                    id="resetToken"
+                                    type="number"
+                                    value={form.resetToken}
+                                    onChange={(e) => setForm({ ...form, resetToken: e.target.value })}
+                                    error={errors.resetToken}
+                                    fullWidth
+                                    autoComplete="reset-token"
+                                    placeholder="Reset token"
+                                />
+
+                                <Input
                                     id="password"
                                     type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={form.password}
+                                    onChange={(e) => setForm({ ...form, password: e.target.value })}
                                     error={errors.password}
                                     fullWidth
                                     autoComplete="new-password"
@@ -178,8 +151,8 @@ export const ResetPasswordPage: React.FC = () => {
                                 <Input
                                     id="confirmPassword"
                                     type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    value={form.confirmPassword}
+                                    onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                                     error={errors.confirmPassword}
                                     fullWidth
                                     autoComplete="new-password"

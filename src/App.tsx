@@ -42,7 +42,7 @@ function AppRoutes() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/confirm-account" element={<ConfirmAccount />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
             <Route path="/upload" element={<ProtectedRoute element={<UploadPage />} />} />
             <Route path="/recycle-bin" element={<ProtectedRoute element={<RecycleBinPage />} />} />

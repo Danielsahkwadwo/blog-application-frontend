@@ -11,7 +11,7 @@ interface AuthContextType {
     logout: () => void;
     confirmAccount: (email: string, token: string) => Promise<boolean>;
     requestPasswordReset: (email: string) => Promise<boolean>;
-    resetPassword: (token: string, newPassword: string) => Promise<boolean>;
+    resetPassword: (email: string, token: string, newPassword: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,53 +39,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (email: string, password: string): Promise<boolean> => {
         setLoading(true);
+        try {
+            const response = await fetch("https://v36p1m6iza.execute-api.eu-central-1.amazonaws.com/dev/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-        // make request
-        const response = await fetch("https://v36p1m6iza.execute-api.eu-central-1.amazonaws.com/dev/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-        });
+            if (!response.ok) {
+                throw new Error("Failed to login: " + response.statusText);
+            }
 
-        if (!response.ok) {
-            throw new Error("Failed to fetch user");
-        }
+            const data: LoginResponse = await response.json();
 
-        const data: LoginResponse = await response.json();
-        Cookies.set("token", data.idToken); // Set token in cookies
-        const { user } = data;
+            // Be sure idToken exists before setting it
+            if (data.idToken) {
+                Cookies.set("token", data.idToken);
+            } else {
+                console.warn("Login succeeded but no idToken in response");
+            }
 
-        if (user) {
-            setUser(user);
-            localStorage.setItem("user", JSON.stringify(user));
+            if (data.user) {
+                setUser(data.user);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error("Login error:", error);
+            return false;
+        } finally {
             setLoading(false);
-            return true;
         }
-
-        setLoading(false);
-        return false;
     };
 
     const signup = async (firstName: string, lastName: string, email: string, password: string): Promise<boolean> => {
         setLoading(true);
+        try {
+            const response = await fetch("https://v36p1m6iza.execute-api.eu-central-1.amazonaws.com/dev/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ firstName, lastName, email, password }),
+            });
 
-        // make request
-        const response = await fetch("https://v36p1m6iza.execute-api.eu-central-1.amazonaws.com/dev/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ firstName, lastName, email, password }),
-        });
+            if (!response.ok) {
+                const errorText = await response.text(); // Get response body to help with debugging
+                throw new Error(`Signup failed: ${response.status} ${response.statusText} - ${errorText}`);
+            }
 
-        if (!response.ok) {
-            throw new Error("Signup failed, try again");
+            return true;
+        } catch (error) {
+            console.error("Signup error:", error);
+            return false;
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
-        return true;
     };
 
     const logout = () => {
@@ -115,31 +128,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const requestPasswordReset = async (email: string): Promise<boolean> => {
         setLoading(true);
 
-        // Simulate API request
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const response = await fetch("https://v36p1m6iza.execute-api.eu-central-1.amazonaws.com/dev/forgot-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        });
 
-        // Check if email exists
-        const userExists = MOCK_USERS.some((u) => u.email === email);
+        if (!response.ok) {
+            throw new Error("Failed to request password reset");
+        }
 
         setLoading(false);
-
-        // In a real app, we would send a reset email if the user exists
-        // For demo purposes, we'll just return whether the email exists
-        return userExists;
+        return true;
     };
 
-    const resetPassword = async (token: string, newPassword: string): Promise<boolean> => {
+    const resetPassword = async (email: string, token: string, newPassword: string): Promise<boolean> => {
         setLoading(true);
 
-        // Simulate API request
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const response = await fetch("https://v36p1m6iza.execute-api.eu-central-1.amazonaws.com/dev/reset-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ confirmationCode: token, newPassword, email }),
+        });
 
-        // In a real app, we would validate the token and update the password in the database
-        // For demo purposes, we'll just simulate success (unless token contains 'invalid')
-        const isValidToken = !token.includes("invalid");
+        if (!response.ok) {
+            throw new Error("Failed to reset password");
+        }
 
         setLoading(false);
-        return isValidToken;
+        return true;
     };
 
     return (
