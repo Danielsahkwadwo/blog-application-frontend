@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { LoginResponse, User } from "../types";
+import Cookies from "js-cookie";
 
 interface AuthContextType {
     user: User | null;
@@ -53,6 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         const data: LoginResponse = await response.json();
+        Cookies.set("token", data.idToken); // Set token in cookies
         const { user } = data;
 
         if (user) {

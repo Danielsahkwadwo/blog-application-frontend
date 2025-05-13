@@ -12,6 +12,7 @@ export interface User {
 export interface LoginResponse {
     success: boolean;
     user: User;
+    idToken: string;
 }
 export interface AuthState {
     user: User | null;
@@ -21,7 +22,7 @@ export interface AuthState {
 
 // Photo types
 export interface Photo {
-    id: string;
+    photoId: string;
     url: string;
     title: string;
     description?: string;
