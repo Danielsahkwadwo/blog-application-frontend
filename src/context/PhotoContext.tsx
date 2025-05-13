@@ -58,8 +58,6 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setLoading(false);
             };
             fetchPhotos();
-        } else {
-            setPhotos([]);
         }
     }, [user]);
 
@@ -68,26 +66,74 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         setLoading(true);
 
-        // Simulate upload delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const token = Cookies.get("token");
+        console.log("Token:", token);
+        const res = await fetch(`https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos/upload-url`, {
+            method: "POST",
+            body: JSON.stringify({
+                fileName: file.name,
+                contentType: file.type,
+                title,
+                description,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (!res.ok) {
+            setLoading(false);
+            showToast("Photo moved to recycle bin", "error");
+            return false;
+        }
+        const { uploadUrl } = await res.json();
+        console.log("Upload URL:", uploadUrl);
+        const uploadRes = await fetch(uploadUrl, {
+            method: "PUT",
+            body: file,
+        });
+        if (!uploadRes.ok) {
+            setLoading(false);
+            showToast("Photo moved to recycle bin", "error");
+            return false;
+        }
 
-        setLoading(false);
         showToast("Photo uploaded successfully", "success");
         return true;
     };
 
-    const deletePhoto = (id: string) => {
-        setPhotos((prevPhotos) =>
-            prevPhotos.map((photo) => (photo.photoId === id ? { ...photo, isDeleted: true } : photo)),
-        );
-        showToast("Photo moved to recycle bin", "info");
+    const deletePhoto = async (id: string) => {
+        const token = Cookies.get("token");
+        console.log("Token:", token);
+        const res = await fetch(`https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (res.ok) {
+            showToast("Photo moved to recycle bin", "info");
+            return;
+        }
+        showToast("Unable to move photo to recycle bin", "info");
     };
 
-    const restorePhoto = (id: string) => {
-        setPhotos((prevPhotos) =>
-            prevPhotos.map((photo) => (photo.photoId === id ? { ...photo, isDeleted: false } : photo)),
-        );
-        showToast("Photo restored successfully", "success");
+    const restorePhoto = async (id: string) => {
+        const token = Cookies.get("token");
+        console.log("Token:", token);
+        const res = await fetch(`https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}/restore`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (res.ok) {
+            showToast("Photo restored successfully", "success");
+            return;
+        }
+        showToast("Photo restore unsuccessfull", "error");
     };
 
     const getDeletedPhotos = () => {

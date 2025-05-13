@@ -30,6 +30,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
     };
 
     const handleConfirmDelete = () => {
+        console.log("Deleting photo with ID:", photoToDelete);
         if (photoToDelete) {
             deletePhoto(photoToDelete);
             setPhotoToDelete(null);
@@ -215,7 +216,6 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 
                 {showDeleteConfirmation && (
                     <DeleteConfirmation
-                        isOpen={true}
                         onClose={handleCancelDelete}
                         onConfirm={handleConfirmDelete}
                         title="Delete Photo"
@@ -238,7 +238,6 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 
             {showDeleteConfirmation && (
                 <DeleteConfirmation
-                    isOpen={true}
                     onClose={handleCancelDelete}
                     onConfirm={handleConfirmDelete}
                     title="Delete Photo"
