@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardFooter } from "../components/ui/Card";
+import { Card, CardContent } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
@@ -136,14 +136,6 @@ export const LoginPage: React.FC = () => {
                             </Button>
                         </form>
                     </CardContent>
-                    <CardFooter className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                        <div className="text-center w-full">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Demo credentials: <span className="font-medium">demo@example.com</span> /{" "}
-                                <span className="font-medium">password123</span>
-                            </p>
-                        </div>
-                    </CardFooter>
                 </Card>
             </div>
         </div>
