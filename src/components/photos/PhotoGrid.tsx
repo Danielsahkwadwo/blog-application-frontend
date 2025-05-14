@@ -29,10 +29,10 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
         setShowDeleteConfirmation(true);
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         console.log("Deleting photo with ID:", photoToDelete);
         if (photoToDelete) {
-            deletePhoto(photoToDelete);
+            await deletePhoto(photoToDelete);
             setPhotoToDelete(null);
             setShowDeleteConfirmation(false);
         }
@@ -43,8 +43,9 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
         setPhotoToDelete(null);
     };
 
-    const handleRestore = (photoId: string) => {
-        restorePhoto(photoId);
+    const handleRestore = async (photoId: string) => {
+        console.log("Restoring photo with ID:", photoId);
+        await restorePhoto(photoId);
     };
 
     const handleShare = (photoId: string) => {

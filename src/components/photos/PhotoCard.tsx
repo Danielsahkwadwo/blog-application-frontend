@@ -34,25 +34,25 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onDeleteClick) {
-      onDeleteClick(photo.id);
+      onDeleteClick(photo.photoId);
     } else {
-      deletePhoto(photo.id);
+      await deletePhoto(photo.photoId);
     }
     setShowMenu(false);
   };
 
-  const handleRestore = (e: React.MouseEvent) => {
+  const handleRestore = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    restorePhoto(photo.id);
+    await restorePhoto(photo.photoId);
     setShowMenu(false);
   };
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    createShareLink(photo.id, 7); // 7 days expiration
+    createShareLink(photo.photoId, 7); // 7 days expiration
     setShowMenu(false);
   };
 

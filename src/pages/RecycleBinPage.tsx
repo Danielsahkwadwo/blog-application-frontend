@@ -117,15 +117,14 @@ export const RecycleBinPage: React.FC = () => {
                         <PhotoGrid photos={currentPhotos} isRecycleBin={true} />
 
                         {/* Pagination */}
-                        {deletedPhotos.length > photosPerPage && (
-                            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                />
-                            </div>
-                        )}
+                        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                alwaysShow={true}
+                            />
+                        </div>
                     </>
                 )}
             </div>
