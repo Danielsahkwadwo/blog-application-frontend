@@ -100,6 +100,13 @@ export const ForgotPasswordPage: React.FC = () => {
                             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                 We've sent a password reset link to {email}
                             </p>
+                            {/* continue to reset password */}
+                            <Link
+                                to="/reset-password"
+                                className="underline mt-4 text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+                            >
+                                Continue to reset password
+                            </Link>
                             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
                                 Didn't receive the email? Check your spam folder or{" "}
                                 <button
