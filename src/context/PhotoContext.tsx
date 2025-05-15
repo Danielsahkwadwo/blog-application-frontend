@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Photo, ShareLink } from "../types";
+import { Photo } from "../types";
 import { useAuth } from "./AuthContext";
 import { useToast } from "../hooks/useToast";
-import { format, addDays } from "date-fns";
+// import { format, addDays } from "date-fns";
 import Cookies from "js-cookie";
 
 interface PhotoContextType {
@@ -13,8 +13,7 @@ interface PhotoContextType {
     restorePhoto: (id: string) => void;
     getDeletedPhotos: () => Photo[];
     getActivePhotos: () => Photo[];
-    createShareLink: (photoId: string, expirationDays: number) => ShareLink;
-    getShareLinks: () => ShareLink[];
+    createShareLink: (photoId: string) => void;
     findPhotoById: (id: string) => Photo | undefined;
 }
 
@@ -30,7 +29,6 @@ export const usePhotos = () => {
 
 export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [photos, setPhotos] = useState<Photo[]>([]);
-    const [shareLinks, setShareLinks] = useState<ShareLink[]>([]);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
     const { showToast } = useToast();
@@ -44,7 +42,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setLoading(true);
                 const token = Cookies.get("token");
                 console.log("Token:", token);
-                const response = await fetch("https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos", {
+                const response = await fetch("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -68,7 +66,8 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         const token = Cookies.get("token");
         console.log("Token:", token);
-        const res = await fetch(`https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos/upload-url`, {
+        console.log("File:", file);
+        const res = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/upload-url`, {
             method: "POST",
             body: JSON.stringify({
                 fileName: file.name,
@@ -90,6 +89,9 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.log("Upload URL:", uploadUrl);
         const uploadRes = await fetch(uploadUrl, {
             method: "PUT",
+            headers: {
+                "Content-Type": file.type,
+            },
             body: file,
         });
         if (!uploadRes.ok) {
@@ -97,7 +99,6 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             showToast("Photo moved to recycle bin", "error");
             return false;
         }
-
         showToast("Photo uploaded successfully", "success");
         return true;
     };
@@ -105,7 +106,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const deletePhoto = async (id: string) => {
         const token = Cookies.get("token");
         console.log("Token:", token);
-        const res = await fetch(`https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}`, {
+        const res = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -122,7 +123,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const restorePhoto = async (id: string) => {
         const token = Cookies.get("token");
         console.log("Token:", token);
-        const res = await fetch(`https://mxaa8mgru7.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}/restore`, {
+        const res = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}/restore`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -144,30 +145,35 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return photos.filter((photo) => !photo.isDeleted);
     };
 
-    const createShareLink = (photoId: string, expirationDays = 7): ShareLink => {
-        const expiresAt = addDays(new Date(), expirationDays).toISOString();
-        const linkId = `share-${Date.now()}`;
-
-        const newShareLink: ShareLink = {
-            id: linkId,
-            photoId,
-            expiresAt,
-            url: `${window.location.origin}/shared/${linkId}`,
-        };
-
-        setShareLinks((prev) => [...prev, newShareLink]);
-        showToast("Share link created and copied to clipboard", "success");
-
-        // Copy to clipboard
-        navigator.clipboard.writeText(newShareLink.url).catch(() => {
-            // Fallback if clipboard API fails
-            showToast("Could not copy to clipboard", "error");
-        });
-
-        return newShareLink;
+    const createShareLink = async (photoId: string) => {
+        const token = Cookies.get("token");
+        console.log("Token:", token);
+        // showToast("Share link created and copied to clipboard", "success");
+        const res = await fetch(
+            `https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/${photoId}/share`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        );
+        if (!res.ok) {
+            showToast("Unable to create share link", "error");
+            return;
+        }
+        const { shareToken } = await res.json();
+        const link = `${window.location.origin}/shared/${shareToken}`;
+        navigator.clipboard
+            .writeText(link)
+            .then(() => {
+                showToast("Share link created and copied to clipboard", "success");
+            })
+            .catch(() => {
+                showToast("Could not copy to clipboard", "error");
+            });
     };
-
-    const getShareLinks = () => shareLinks;
 
     const findPhotoById = (id: string) => {
         return photos.find((photo) => photo.photoId === id);
@@ -184,7 +190,6 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 getDeletedPhotos,
                 getActivePhotos,
                 createShareLink,
-                getShareLinks,
                 findPhotoById,
             }}
         >
