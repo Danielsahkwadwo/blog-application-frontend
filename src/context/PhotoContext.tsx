@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Photo } from "../types";
 import { useAuth } from "./AuthContext";
 import { useToast } from "../hooks/useToast";
 // import { format, addDays } from "date-fns";
 import Cookies from "js-cookie";
+import useSWR, { mutate } from "swr";
 
 interface PhotoContextType {
     photos: Photo[];
@@ -27,37 +28,33 @@ export const usePhotos = () => {
     return context;
 };
 
+const fetcher = async (url: string) => {
+    const token = Cookies.get("token");
+
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    const data = await res.json();
+    return data.photos;
+};
+
 export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
     const { showToast } = useToast();
-
-    // Load photos when user changes
-    useEffect(() => {
-        if (user) {
-            // In a real app, fetch photos from API
-            // For demo, use mock data with a delay
-            const fetchPhotos = async () => {
-                setLoading(true);
-                const token = Cookies.get("token");
-                console.log("Token:", token);
-                const response = await fetch("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }); // Replace with actual API call
-                const data = await response.json();
-                console.log("Photos data:", data.photos);
-                setPhotos(data.photos);
-
-                setLoading(false);
-            };
-            fetchPhotos();
-        }
-    }, [user]);
+    useSWR("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/", fetcher, {
+        refreshInterval: 10000,
+        onSuccess: (data) => {
+            console.log("Fetched photos:", data);
+            setPhotos(data);
+            setLoading(false);
+        },
+    });
 
     const uploadPhoto = async (file: File, title: string, description?: string): Promise<boolean> => {
         if (!user) return false;
@@ -114,6 +111,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             },
         });
         if (res.ok) {
+            mutate("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/");
             showToast("Photo moved to recycle bin", "info");
             return;
         }
@@ -131,6 +129,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             },
         });
         if (res.ok) {
+            mutate("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/");
             showToast("Photo restored successfully", "success");
             return;
         }
