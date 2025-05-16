@@ -30,6 +30,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
     };
 
     const handleConfirmDelete = () => {
+        console.log("Deleting photo with ID:", photoToDelete);
         if (photoToDelete) {
             deletePhoto(photoToDelete);
             setPhotoToDelete(null);
@@ -47,12 +48,12 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
     };
 
     const handleShare = (photoId: string) => {
-        createShareLink(photoId, 7); // 7 days expiration
+        createShareLink(photoId); // 7 days expiration
     };
 
     const handleDownload = (photo: Photo) => {
         const link = document.createElement("a");
-        link.href = photo.url;
+        link.href = photo.photoUrl;
         link.download = `${photo.title}.jpg`;
         document.body.appendChild(link);
         link.click();
@@ -120,7 +121,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
                             <div className="flex flex-col sm:flex-row items-start sm:items-center p-4">
                                 <div className="relative group">
                                     <img
-                                        src={photo.url}
+                                        src={photo.photoUrl}
                                         alt={photo.title}
                                         className="h-24 w-24 sm:h-20 sm:w-20 object-cover rounded-lg cursor-pointer"
                                         onClick={() =>
@@ -215,7 +216,6 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 
                 {showDeleteConfirmation && (
                     <DeleteConfirmation
-                        isOpen={true}
                         onClose={handleCancelDelete}
                         onConfirm={handleConfirmDelete}
                         title="Delete Photo"
@@ -238,7 +238,6 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 
             {showDeleteConfirmation && (
                 <DeleteConfirmation
-                    isOpen={true}
                     onClose={handleCancelDelete}
                     onConfirm={handleConfirmDelete}
                     title="Delete Photo"

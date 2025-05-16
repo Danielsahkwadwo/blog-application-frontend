@@ -23,7 +23,7 @@ export interface AuthState {
 // Photo types
 export interface Photo {
     photoId: string;
-    url: string;
+    photoUrl: string;
     title: string;
     description?: string;
     uploadedAt: string;
