@@ -161,19 +161,19 @@ export const DashboardPage: React.FC = () => {
                     },
                     {
                         title: "Shared Photos",
-                        value: 3,
+                        value: "N/A",
                         icon: <Filter className="h-5 w-5 text-accent-500" />,
                         color: "bg-accent-50 dark:bg-accent-900/20",
                     },
                     {
                         title: "Storage Used",
-                        value: "128 MB",
+                        value: "N/A",
                         icon: <SlidersHorizontal className="h-5 w-5 text-purple-500" />,
                         color: "bg-purple-50 dark:bg-purple-900/20",
                     },
                     {
                         title: "Recent Uploads",
-                        value: "2 today",
+                        value: "N/A",
                         icon: <UploadCloud className="h-5 w-5 text-green-500" />,
                         color: "bg-green-50 dark:bg-green-900/20",
                     },

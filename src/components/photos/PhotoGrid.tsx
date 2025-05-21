@@ -6,6 +6,7 @@ import { Download, Share2, Trash2, RefreshCw, Image as ImageIcon } from "lucide-
 import { Button } from "../ui/Button";
 import { usePhotos } from "../../context/PhotoContext";
 import { DeleteConfirmation } from "../ui/DeleteConfirmation";
+import { useNavigate } from "react-router-dom";
 
 interface PhotoGridProps {
     photos: Photo[];
@@ -20,6 +21,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
     loading = false,
     viewMode = "grid",
 }) => {
+    const navigate = useNavigate()
     const { deletePhoto, restorePhoto, createShareLink } = usePhotos();
     const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -100,7 +102,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
                         variant="gradient"
                         className="mt-6"
                         icon={<ImageIcon className="h-4 w-4 mr-2" />}
-                        onClick={() => (window.location.href = "/upload")}
+                        onClick={()=>navigate("/upload")}
                     >
                         Upload Your First Photo
                     </Button>
