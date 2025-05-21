@@ -16,6 +16,7 @@ interface PhotoContextType {
     getActivePhotos: () => Photo[];
     createShareLink: (photoId: string) => void;
     findPhotoById: (id: string) => Photo | undefined;
+    emptyRecycleBin: () => void;
 }
 
 const PhotoContext = createContext<PhotoContextType | undefined>(undefined);
@@ -47,10 +48,9 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
     const { showToast } = useToast();
-    useSWR("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/", fetcher, {
+    useSWR("https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/", fetcher, {
         refreshInterval: 10000,
         onSuccess: (data) => {
-            console.log("Fetched photos:", data);
             setPhotos(data);
             setLoading(false);
         },
@@ -62,9 +62,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setLoading(true);
 
         const token = Cookies.get("token");
-        console.log("Token:", token);
-        console.log("File:", file);
-        const res = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/upload-url`, {
+        const res = await fetch(`https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/upload-url`, {
             method: "POST",
             body: JSON.stringify({
                 fileName: file.name,
@@ -83,7 +81,6 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             return false;
         }
         const { uploadUrl } = await res.json();
-        console.log("Upload URL:", uploadUrl);
         const uploadRes = await fetch(uploadUrl, {
             method: "PUT",
             headers: {
@@ -96,14 +93,13 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             showToast("Photo moved to recycle bin", "error");
             return false;
         }
-        showToast("Photo uploaded successfully", "success");
         return true;
     };
 
     const deletePhoto = async (id: string) => {
         const token = Cookies.get("token");
-        console.log("Token:", token);
-        const res = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}`, {
+
+        const res = await fetch(`https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -111,17 +107,35 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             },
         });
         if (res.ok) {
-            mutate("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/");
+            mutate("https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/");
             showToast("Photo moved to recycle bin", "info");
             return;
         }
         showToast("Unable to move photo to recycle bin", "info");
     };
+    const emptyRecycleBin = async () => {
+        const token = Cookies.get("token");
+        const res = await fetch(
+            `https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/recycle-bin/empty`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        );
+        if (res.ok) {
+            mutate("https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/");
+            showToast("Recycle bin emptied successfully", "success");
+            return;
+        }
+        showToast("Unable to empty recycle bin", "error");
+    };
 
     const restorePhoto = async (id: string) => {
         const token = Cookies.get("token");
-        console.log("Token:", token);
-        const res = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/${id}/restore`, {
+        const res = await fetch(`https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/${id}/restore`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -129,7 +143,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             },
         });
         if (res.ok) {
-            mutate("https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/");
+            mutate("https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/");
             showToast("Photo restored successfully", "success");
             return;
         }
@@ -146,10 +160,9 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const createShareLink = async (photoId: string) => {
         const token = Cookies.get("token");
-        console.log("Token:", token);
         // showToast("Share link created and copied to clipboard", "success");
         const res = await fetch(
-            `https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/photos/${photoId}/share`,
+            `https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/photos/${photoId}/share`,
             {
                 method: "POST",
                 headers: {
@@ -190,6 +203,7 @@ export const PhotoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 getActivePhotos,
                 createShareLink,
                 findPhotoById,
+                emptyRecycleBin,
             }}
         >
             {children}

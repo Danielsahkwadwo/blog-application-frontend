@@ -8,7 +8,7 @@ import { DeleteConfirmation } from "../components/ui/DeleteConfirmation";
 import { Pagination } from "../components/ui/Pagination";
 
 export const RecycleBinPage: React.FC = () => {
-    const { getDeletedPhotos, loading } = usePhotos();
+    const { getDeletedPhotos, loading, emptyRecycleBin } = usePhotos();
     const [currentPage, setCurrentPage] = useState(1);
     const photosPerPage = 12; // Show 12 photos per page
     const deletedPhotos = getDeletedPhotos();
@@ -33,6 +33,7 @@ export const RecycleBinPage: React.FC = () => {
 
     const handleEmptyRecycleBin = () => {
         // In a real app, this would permanently delete all photos in the recycle bin
+        emptyRecycleBin();
         setShowEmptyConfirmation(false);
         // Implementation would go here
     };

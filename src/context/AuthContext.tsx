@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const login = async (email: string, password: string): Promise<boolean> => {
         setLoading(true);
         try {
-            const response = await fetch("https://oi3mf971zl.execute-api.eu-central-1.amazonaws.com/dev/login", {
+            const response = await fetch("https://jc60njfsgl.execute-api.eu-central-1.amazonaws.com/prod/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const signup = async (firstName: string, lastName: string, email: string, password: string): Promise<boolean> => {
         setLoading(true);
         try {
-            const response = await fetch("https://oi3mf971zl.execute-api.eu-central-1.amazonaws.com/dev/signup", {
+            const response = await fetch("https://jc60njfsgl.execute-api.eu-central-1.amazonaws.com/prod/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const confirmAccount = async (email: string, token: string): Promise<boolean> => {
         setLoading(true);
 
-        const response = await fetch("https://oi3mf971zl.execute-api.eu-central-1.amazonaws.com/dev/confirm-signup", {
+        const response = await fetch("https://jc60njfsgl.execute-api.eu-central-1.amazonaws.com/prod/confirm-signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const requestPasswordReset = async (email: string): Promise<boolean> => {
         setLoading(true);
 
-        const response = await fetch("https://oi3mf971zl.execute-api.eu-central-1.amazonaws.com/dev/forgot-password", {
+        const response = await fetch("https://jc60njfsgl.execute-api.eu-central-1.amazonaws.com/prod/forgot-password", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const resetPassword = async (email: string, token: string, newPassword: string): Promise<boolean> => {
         setLoading(true);
 
-        const response = await fetch("https://oi3mf971zl.execute-api.eu-central-1.amazonaws.com/dev/reset-password", {
+        const response = await fetch("https://jc60njfsgl.execute-api.eu-central-1.amazonaws.com/prod/reset-password", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

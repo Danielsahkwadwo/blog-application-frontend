@@ -3,10 +3,18 @@ import { useParams, Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Camera, Download, AlertTriangle, ArrowLeft } from "lucide-react";
-import { Photo } from "../types";
 
 // In a real app, this would fetch from the backend
 // For this demo, we'll use a static photo
+export interface Photo {
+    photoId: string;
+    imageUrl: string;
+    title: string;
+    description?: string;
+    uploadedAt: string;
+    isDeleted: boolean;
+    userId: string;
+}
 
 export const SharedPhotoPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -18,12 +26,15 @@ export const SharedPhotoPage: React.FC = () => {
         const fetchSharedPhoto = async () => {
             setLoading(true);
 
-            const response = await fetch(`https://8frphsplx6.execute-api.eu-central-1.amazonaws.com/dev/shared/${id}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
+            const response = await fetch(
+                `https://v57gg0e6n4.execute-api.eu-central-1.amazonaws.com/prod/shared/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                 },
-            });
+            );
 
             if (!response.ok) {
                 setError("Failed to fetch photo");
@@ -44,7 +55,7 @@ export const SharedPhotoPage: React.FC = () => {
         if (!photo) return;
 
         const link = document.createElement("a");
-        link.href = photo.photoUrl;
+        link.href = photo.imageUrl;
         link.download = `${photo.title}.jpg`;
         document.body.appendChild(link);
         link.click();
