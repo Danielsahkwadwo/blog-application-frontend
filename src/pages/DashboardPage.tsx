@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Layout } from "../components/layout/Layout";
 import { PhotoGrid } from "../components/photos/PhotoGrid";
 import { usePhotos } from "../context/PhotoContext";
@@ -18,12 +18,18 @@ import { useAuth } from "../context/AuthContext";
 import { Pagination } from "../components/ui/Pagination";
 
 export const DashboardPage: React.FC = () => {
-    const { getActivePhotos, loading } = usePhotos();
+    const { getActivePhotos, loading, fetchPhotos } = usePhotos();
     const { user } = useAuth();
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const photosPerPage = 12; // Show 12 photos per page
+    
+    // Fetch photos when component mounts
+    useEffect(() => {
+        fetchPhotos();
+    }, []);
+    
     const photos = getActivePhotos();
 
     // Filter photos based on search query
@@ -48,7 +54,7 @@ export const DashboardPage: React.FC = () => {
     }, [filteredPhotos, currentPage, photosPerPage]);
 
     // Reset to first page when search query changes
-    React.useEffect(() => {
+    useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
 

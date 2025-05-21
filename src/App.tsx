@@ -34,7 +34,25 @@ const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) 
     return isAuthenticated ? element : <Navigate to="/login" />;
 };
 
-function AppRoutes() {
+// Routes with authentication wrapper
+const AuthenticatedRoutes = () => {
+    const { isAuthenticated } = useAuth();
+    
+    return isAuthenticated ? (
+        <PhotoProvider>
+            <Routes>
+                <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
+                <Route path="/upload" element={<ProtectedRoute element={<UploadPage />} />} />
+                <Route path="/recycle-bin" element={<ProtectedRoute element={<RecycleBinPage />} />} />
+                <Route path="/shared/:id" element={<SharedPhotoPage />} />
+                <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+        </PhotoProvider>
+    ) : null;
+};
+
+// Public routes
+const PublicRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -43,10 +61,7 @@ function AppRoutes() {
             <Route path="/confirm-account" element={<ConfirmAccount />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
-            <Route path="/upload" element={<ProtectedRoute element={<UploadPage />} />} />
-            <Route path="/recycle-bin" element={<ProtectedRoute element={<RecycleBinPage />} />} />
-            <Route path="/shared/:id" element={<SharedPhotoPage />} />
+            <Route path="/shared/:id" element={<PhotoProvider><SharedPhotoPage /></PhotoProvider>} />
             <Route path="/404" element={<ErrorPage />} />
             <Route
                 path="/error"
@@ -61,6 +76,16 @@ function AppRoutes() {
             <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
     );
+};
+
+function AppRoutes() {
+    const { isAuthenticated } = useAuth();
+    
+    return (
+        <>
+            {isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />}
+        </>
+    );
 }
 
 function App() {
@@ -69,11 +94,9 @@ function App() {
             <ThemeProvider>
                 <AuthProvider>
                     <NotificationProvider>
-                        <PhotoProvider>
-                            <ErrorBoundary>
-                                <AppRoutes />
-                            </ErrorBoundary>
-                        </PhotoProvider>
+                        <ErrorBoundary>
+                            <AppRoutes />
+                        </ErrorBoundary>
                     </NotificationProvider>
                 </AuthProvider>
             </ThemeProvider>

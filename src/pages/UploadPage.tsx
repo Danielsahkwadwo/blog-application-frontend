@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
@@ -17,9 +17,14 @@ export const UploadPage: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStep, setUploadStep] = useState<'select' | 'details' | 'uploading' | 'complete'>('select');
-  const { uploadPhoto } = usePhotos();
+  const { uploadPhoto, fetchPhotos } = usePhotos();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  
+  // Fetch photos when component mounts
+  useEffect(() => {
+    fetchPhotos();
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -85,6 +90,12 @@ export const UploadPage: React.FC = () => {
         showToast('Failed to upload photo', 'error');
       }
     }, 500);
+  };
+
+  const handleGoToDashboard = () => {
+    // Ensure photos are refreshed before navigating
+    fetchPhotos();
+    navigate('/dashboard');
   };
 
   const resetForm = () => {
@@ -220,7 +231,7 @@ export const UploadPage: React.FC = () => {
         return (
           <div className="p-8 flex flex-col items-center justify-center text-center">
             <div className="mb-8">
-              <div className="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-4">
+              <div className="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-4 mx-auto">
                 <Upload className="h-10 w-10 text-primary-600 dark:text-primary-400" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Uploading Photo</h2>
@@ -245,7 +256,7 @@ export const UploadPage: React.FC = () => {
         return (
           <div className="p-8 flex flex-col items-center justify-center text-center">
             <div className="mb-8">
-              <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+              <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 mx-auto">
                 <Check className="h-10 w-10 text-green-600 dark:text-green-400" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Upload Complete!</h2>
@@ -260,7 +271,7 @@ export const UploadPage: React.FC = () => {
                 Upload Another
               </Button>
               <Button
-                onClick={() => navigate('/dashboard')}
+                onClick={handleGoToDashboard}
                 icon={<ArrowLeft className="h-4 w-4 mr-2" />}
               >
                 Go to Dashboard

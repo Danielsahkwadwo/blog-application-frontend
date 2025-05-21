@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Layout } from "../components/layout/Layout";
 import { PhotoGrid } from "../components/photos/PhotoGrid";
 import { usePhotos } from "../context/PhotoContext";
@@ -8,11 +8,17 @@ import { DeleteConfirmation } from "../components/ui/DeleteConfirmation";
 import { Pagination } from "../components/ui/Pagination";
 
 export const RecycleBinPage: React.FC = () => {
-    const { getDeletedPhotos, loading, emptyRecycleBin } = usePhotos();
+    const { getDeletedPhotos, loading, emptyRecycleBin, fetchPhotos } = usePhotos();
     const [currentPage, setCurrentPage] = useState(1);
     const photosPerPage = 12; // Show 12 photos per page
-    const deletedPhotos = getDeletedPhotos();
     const [showEmptyConfirmation, setShowEmptyConfirmation] = useState(false);
+    
+    // Fetch photos when component mounts
+    useEffect(() => {
+        fetchPhotos();
+    }, []);
+    
+    const deletedPhotos = getDeletedPhotos();
 
     // Get current page photos
     const currentPhotos = useMemo(() => {

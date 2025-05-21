@@ -104,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const logout = () => {
         setUser(null);
         localStorage.removeItem("user");
+        Cookies.remove("token");
     };
 
     const confirmAccount = async (email: string, token: string): Promise<boolean> => {
