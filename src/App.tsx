@@ -37,14 +37,13 @@ const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) 
 // Routes with authentication wrapper
 const AuthenticatedRoutes = () => {
     const { isAuthenticated } = useAuth();
-    
+
     return isAuthenticated ? (
         <PhotoProvider>
             <Routes>
                 <Route path="/dashboard" element={<ProtectedRoute element={<DashboardPage />} />} />
                 <Route path="/upload" element={<ProtectedRoute element={<UploadPage />} />} />
                 <Route path="/recycle-bin" element={<ProtectedRoute element={<RecycleBinPage />} />} />
-                <Route path="/shared/:id" element={<SharedPhotoPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
         </PhotoProvider>
@@ -61,7 +60,7 @@ const PublicRoutes = () => {
             <Route path="/confirm-account" element={<ConfirmAccount />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/shared/:id" element={<PhotoProvider><SharedPhotoPage /></PhotoProvider>} />
+            <Route path="/shared/:id" element={<SharedPhotoPage />} />
             <Route path="/404" element={<ErrorPage />} />
             <Route
                 path="/error"
@@ -80,12 +79,8 @@ const PublicRoutes = () => {
 
 function AppRoutes() {
     const { isAuthenticated } = useAuth();
-    
-    return (
-        <>
-            {isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />}
-        </>
-    );
+
+    return <>{isAuthenticated ? <AuthenticatedRoutes /> : <PublicRoutes />}</>;
 }
 
 function App() {
